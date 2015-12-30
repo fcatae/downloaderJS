@@ -1,8 +1,7 @@
 var response;
 
-$.get('http://blogs.msdn.com/fcatae', function(r) {
-   
+$.get('teste.html', function(r) {   
    response = r;
-   alert(r);
-    
+   alert(r);    
 });
+
