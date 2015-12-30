@@ -15,6 +15,10 @@ var response;
 //     }
 // });
 
-$('h1').load('teste.html', function(r) {
-    alert('completed');
+// $('h1').load('teste.html', function(r) {
+//     alert('completed');
+// });
+
+$('h1').load('teste.html p', function(r) {
+    alert(r);
 });
