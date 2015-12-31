@@ -12,12 +12,28 @@ function processPage(body) {
     var title = $('.post-name').text();
     var content = $('.post-content').html();
     
-    processResult(title, content);
+    processResult(title, content, $);
 }
 
-function processResult(title, content) {
+function processResult(title, content, $) {
     console.log("title: " + title);
-    fs.writeFile('fcatae.htm', content);
+    
+    // fs.writeFile('fcatae.htm', content);
+    
+    var imgs = $('img');
+    var hrefs = $('a');
+    
+    console.log('IMG')
+    imgs.each(function() {
+        console.log('    ' + $(this).attr('src'));
+    });
+    
+    console.log('LINK')
+    hrefs.each(function() {
+        console.log('    ' + $(this).attr('href'));
+    });
+    
+    
 }
 //.pipe(fs.createWriteStream("fcatae.htm"));
 
