@@ -34,26 +34,53 @@ function processResult(title, content, $) {
 // 
 //     console.log('LINK')
 //     console.log(linkList);
-        
-    getExternalImage(imageList[0]);
+    
+    var tasks = 0;
+    
+    imgs.each(function() {
+        createInlineImage($(this));
+    });
+    
+    //createInlineImage($('img'));
+    
+    function createInlineImage(elem) {        
+                 
+        tasks++;   
+        var src = elem.attr('src');                   
+                   
+        getExternalImage(src, function(imageSrc) {            
+            elem.attr('src', imageSrc);
+            
+            console.log(elem.parent().html())
+            
+            tasks--;
+            
+            if(tasks == 0) {
+                finishImageProcessing();                 
+            }
+        });        
+    }    
+    
+    function finishImageProcessing() {
+        fs.writeFileSync('fcatae.htm', $.html());
+    }
+    
 }
 
-var cache = {};
+function getExternalImage(url, callback) {
 
-function getExternalImage(url) {
-    console.log(url);
+    request( {url: url, encoding: null} , function(error, response, body) {
 
-    request( {url: url, encoding: null} , function(error, request, body) {
-       cache[url] = body;
+        var contentType = response.headers['content-type'];
+        var contentData = body.toString('base64');
+        
+        var imageSrc = `data:${contentType};base64,${contentData}`;
 
-       var contentType = request.headers['content-type'];
-       var contentData = body.toString('base64');
-       
-       fs.writeFileSync('fcatae.htm', `<img src="data:${contentType};base64,${contentData}">`);
-       
+        callback(imageSrc);
+                   
     });    
         
-    request(url).pipe(fs.createWriteStream("fcatae.png"));
+    //request(url).pipe(fs.createWriteStream("fcatae.png"));
     
 }
 
