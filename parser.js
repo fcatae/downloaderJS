@@ -4,22 +4,38 @@ var fs = require('fs');
 var URL = require('url');
 var OUTPUTDIR = 'output/';
 
-request('http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source.aspx', function(error, request, body) {
-    processPage(body);
+fs.mkdir(OUTPUTDIR, function(err) {
+
+    // ignore err
+    processUrl('http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source.aspx');
+    
 });
 
-function processPage(body) {
-    var document = cheerio.load(body);
 
-    var title = document('.post-name').text();
+function processUrl(url) {
+    
+    request(url, function(error, request, body) {
+        processPage(url, body);
+    });
+
+}
+
+function processPage(url, body) {
+    var document = cheerio.load(body);
+    
+    var title = document('.post-name').text();    
     var content = document('.post-content').html();
     
     console.log("title: " + title);
+
+    fs.writeFileSync(OUTPUTDIR + createFilename(url), document.html());
     
     processResult(content, finishProcessing);    
     
     function finishProcessing(html) {
-        fs.writeFileSync(OUTPUTDIR + title + '.htm', html);
+        var filename = createFilename2(url);
+        console.log("filename: " + filename);
+        fs.writeFileSync(OUTPUTDIR + filename, html);
     }
 }
 
@@ -107,12 +123,33 @@ function saveExternalImage(url, callback) {
     if( filename && filename.match(/(PNG|JPG)$/i) ) {
 
         request( {url: url, encoding: null} , function(error, response, body) {
-            console.log('writing: ' + OUTPUTDIR + filename)
+            //console.log('writing: ' + OUTPUTDIR + filename)
             fs.writeFile(OUTPUTDIR + filename, body, callback);
         });   
 
     }
     
+}
+
+function createFilename(url) {
+
+    var components = url.split('/');
+    var filename = components.pop();
+    
+    return filename;
+}
+
+function createFilename2(url) {
+
+    //'http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source.aspx'
+    
+    var components = url.split('/');
+    var filename = components.pop();
+    var day = components.pop();
+    var month = components.pop();
+    var year = components.pop();
+    
+    return `${year}${month}${day}-${filename}.html`;
 }
 
 function printFilename(src) {
