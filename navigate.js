@@ -1,8 +1,13 @@
 var cheerio = require('cheerio');
 var request = require('request');
 
+var secret = require('./secret.js');
+
+console.log(secret.url);
+console.log(secret.token);
+
 var request = initAuthRequest(
-       'http://blogs.msdn.com',     'RPSMCA=etc'
+       'http://blogs.msdn.com', ''
 )
 
 var url = 'http://blogs.msdn.com/b/fcatae/archive/2016/05/24/set-showplan-text.aspx';
