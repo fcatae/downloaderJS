@@ -8,7 +8,7 @@ try {
     fs.mkdirSync(OUTPUTDIR);    
 } catch(e) {}
 
-example();
+//example();
 
 function example() {
     
@@ -155,7 +155,7 @@ function saveExternalImage(url, callback) {
     var path = URL.parse(url).path;
     var filename = path.split('/').pop();
      
-    if( filename && filename.match(/(PNG|JPG)$/i) ) {
+    if( filename && filename.match(/(PNG|JPG|GIF)$/i) ) {
 
         request( {url: url, encoding: null} , function(error, response, body) {
             //console.log('writing: ' + OUTPUTDIR + filename)
