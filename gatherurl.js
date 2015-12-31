@@ -4,41 +4,52 @@ var cheerio = require('cheerio');
 var request = require('request');
 var fs = require('fs');
 var URL = require('url');
-var OUTPUTDIR = 'output/';
+// var OUTPUTDIR = 'output/';
+// 
+// fs.mkdir(OUTPUTDIR, function(err) {
+// 
+//     // ignore err  
+//     
+// });
 
-fs.mkdir(OUTPUTDIR, function(err) {
-
-    // ignore err  
+function example() {
     
-});
-
-findBlogIndex('http://blogs.msdn.com/b/fcatae/default.aspx', function(links) {
-
-    var lista = [];
-    var pendingGatherUrls = links.length;
- 
-    links.forEach(function(baseurl) {
-        
-        console.log(baseurl);
-        
-        gatherUrls(baseurl, function(links) {
-            
-            pendingGatherUrls--;
-            
-            lista = lista.concat(links);
-
-            if( pendingGatherUrls == 0 ) {
-                finishedGatherUrls();
-            }
-        });
-        
+    findBlogUrls('http://blogs.msdn.com/b/fcatae/default.aspx', function(lista) {
+        console.log('  Total: ' + lista.length);
     })
 
-    function finishedGatherUrls() {
-        console.log('  Total: ' + lista.length)
-    }    
-        
-});
+}
+
+function findBlogUrls(page, callback) {
+    
+    findBlogIndex(page, function(links) {
+
+        var lista = [];
+        var pendingGatherUrls = links.length;
+    
+        links.forEach(function(baseurl) {
+            
+            gatherUrls(baseurl, function(links) {
+                
+                pendingGatherUrls--;
+                
+                lista = lista.concat(links);
+
+                if( pendingGatherUrls == 0 ) {
+                    finishedGatherUrls();
+                }
+            });
+            
+        })
+
+        function finishedGatherUrls() {
+            callback(lista);
+        }    
+            
+    });
+
+}
+
 
 function findBlogIndex(url, callback) {
 
@@ -93,6 +104,7 @@ function gatherUrls(baseurl, callback) {
         callback(links);
         
     });
-
     
 }
+
+exports.exec = findBlogUrls;

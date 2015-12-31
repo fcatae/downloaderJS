@@ -25,21 +25,25 @@ var list_hidden = [
     'http://blogs.msdn.com/b/fcatae/archive/2016/01/05/monitore-o-consumo-de-recursos-do-banco-de-dados.aspx'
     ];
 
-var list_public = [];
-
 // 1. check json file. exists?
 var filelist = checkFilelistJson('output/filelist.json');
 
-console.log(filelist);
+if(!filelist) {
 
-if( !filelist ) {
-    console.log('jsonfile')
+    var gatherurl = require('./gatherurl');
+    gatherurl.exec('http://blogs.msdn.com/b/fcatae/default.aspx', function(list) {
+    
+        filelist = list.concat(list_hidden);
+
+        saveFilelistJson('output/filelist.json', filelist);        
+    })
 }
+
+console.log('filelist = ' + filelist.length);
 
 // gather URL's
 
 // save json result
-var list_all = list_public.concat(list_hidden);
 
 
 // 2. open json file and check pages. downloaded?
@@ -53,6 +57,9 @@ var list_all = list_public.concat(list_hidden);
 
 // parser logic
 
+function createFilelistJson(filename) {
+}
+
 function checkFilelistJson(filename) {
     
     var filelist;
@@ -64,12 +71,11 @@ function checkFilelistJson(filename) {
     }
     catch(e) {}
         
-       console.log(filelist);    
-
     if( filelist && filelist.length && filelist.length > 0 ) {
-
-        console.log(filelist);
-
         return filelist;
     }    
+}
+
+function saveFilelistJson(filename, data) {
+    fs.writeFileSync(filename, JSON.stringify(data), 'utf8');
 }
