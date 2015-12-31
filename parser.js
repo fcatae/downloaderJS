@@ -108,11 +108,22 @@ function processImages(images, callback) {
             
             var imageSrc = `data:${contentType};base64,${contentData}`;
 
+            saveToImageDisk(url, body);
+            
             callback(imageSrc);
                     
         });    
         
     }
+}
+
+function saveToImageDisk(url, body, callback) {
+
+    var path = URL.parse(url).path;
+    var filename = path.split('/').pop();
+     
+    fs.writeFile(OUTPUTDIR + filename, body, callback);
+    
 }
 
 function saveExternalImage(url, callback) {
