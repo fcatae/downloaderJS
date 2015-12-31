@@ -12,11 +12,65 @@ fs.mkdir(OUTPUTDIR, function(err) {
     
 });
 
+findBlogIndex('http://blogs.msdn.com/b/fcatae/default.aspx', function(links) {
 
-gatherUrls('http://blogs.msdn.com/b/fcatae/default.aspx?PageIndex=90');
+    var lista = [];
+    var pendingGatherUrls = links.length;
+ 
+    links.forEach(function(baseurl) {
+        
+        console.log(baseurl);
+        
+        gatherUrls(baseurl, function(links) {
+            
+            pendingGatherUrls--;
+            
+            lista = lista.concat(links);
 
+            if( pendingGatherUrls == 0 ) {
+                finishedGatherUrls();
+            }
+        });
+        
+    })
 
-function gatherUrls(baseurl) {
+    function finishedGatherUrls() {
+        console.log('  Total: ' + lista.length)
+    }    
+        
+});
+
+function findBlogIndex(url, callback) {
+
+    var parsedUrl = URL.parse(url);
+    var baseUrl = parsedUrl.protocol + '//' + parsedUrl.host 
+    
+    var finder = /.*default.aspx\?PageIndex=(\d*)$/;
+    
+    request( url, function (err, res, body) { 
+      
+        var $ = cheerio.load(body);
+        
+        var links = $('a')
+            .map(function() {
+                
+                var link = String( $(this).attr('href') );
+                var match = link.match(finder);                
+                
+                return match && (baseUrl + match[0]);
+                
+            }).get();
+        
+        callback(links);              
+        
+    });
+    
+}
+
+function gatherUrls(baseurl, callback) {
+
+    var parsedUrl = URL.parse(baseurl);
+    var baseUrl = parsedUrl.protocol + '//' + parsedUrl.host 
     
     request( baseurl, function (err, res, body) { 
       
@@ -24,16 +78,19 @@ function gatherUrls(baseurl) {
         
         var postlist = $('.blog-post-list .content-list .content-item');
         
-        postlist.each(function(i, post) {
+        var links = postlist
+            .map(function(i, post) {
             
-            var postname = $(post).find('.post-name');
-            var elem = postname.find('a');            
-            
-            var name = elem.text();
-            var link = elem.attr('href');
-            
-            console.log(` Article: ${name} (${link})`);
-        })            
+                var postname = $(post).find('.post-name');
+                var elem = postname.find('a');            
+                
+                //var name = elem.text();
+                var link = baseUrl + elem.attr('href');
+                
+                return link;            
+            }).get();
+        
+        callback(links);
         
     });
 
