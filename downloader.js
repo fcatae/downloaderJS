@@ -35,18 +35,34 @@ if(!filelist) {
     
         filelist = list.concat(list_hidden);
 
-        saveFilelistJson('output/filelist.json', filelist);        
+        saveFilelistJson('output/filelist.json', filelist);
+        
+        completeStep1();        
     })
 }
+else {
+    completeStep1();
+}
 
-console.log('filelist = ' + filelist.length);
-
-// gather URL's
-
-// save json result
-
+function completeStep1() {
+    console.log('Step 1. filelist.json = ' + filelist.length);
+    
+    startStep2();
+}
 
 // 2. open json file and check pages. downloaded?
+function startStep2() {
+    
+    var secret = require('./output/secret');
+    var navigate = require('./navigate')
+    
+    navigate.init(secret);
+    
+    filelist.forEach(function(filename) {
+        navigate.create(filename);
+    });
+}
+
 
 // navigate URL's with AUTH
 
