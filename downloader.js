@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 // hidden URL's
 var list_hidden = [
     'http://blogs.msdn.com/b/fcatae/archive/2016/09/01/as-9-regras-ninjas-de-performance.aspx',
@@ -26,7 +28,11 @@ var list_hidden = [
 var list_public = [];
 
 // 1. check json file. exists?
-if( !checkFilelistJson('output/filelist.json') ) {
+var filelist = checkFilelistJson('output/filelist.json');
+
+console.log(filelist);
+
+if( !filelist ) {
     console.log('jsonfile')
 }
 
@@ -47,6 +53,23 @@ var list_all = list_public.concat(list_hidden);
 
 // parser logic
 
-function checkFilelistJson() {
-    return false;
+function checkFilelistJson(filename) {
+    
+    var filelist;
+        var data;
+    
+    try {
+        data = fs.readFileSync(filename, 'utf8');        
+        filelist = JSON.parse(data);     
+    }
+    catch(e) {}
+        
+       console.log(filelist);    
+
+    if( filelist && filelist.length && filelist.length > 0 ) {
+
+        console.log(filelist);
+
+        return filelist;
+    }    
 }
