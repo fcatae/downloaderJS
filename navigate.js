@@ -1,14 +1,9 @@
 var cheerio = require('cheerio');
 var request = require('request');
 
-var secret = require('./secret.js');
+var secret = require('./output/secret.js');
 
-console.log(secret.url);
-console.log(secret.token);
-
-var request = initAuthRequest(
-       'http://blogs.msdn.com', ''
-)
+var request = initAuthRequest(secret.url, secret.token);
 
 var url = 'http://blogs.msdn.com/b/fcatae/archive/2016/05/24/set-showplan-text.aspx';
 
