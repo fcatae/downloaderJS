@@ -52,7 +52,7 @@ fs.mkdir(OUTPUTDIR, function(err) {
     // ignore err
     
     lista.forEach(function(url) {
-        openHiddenUrl(url);        
+        openHiddenUrl(url);
     });    
     
 });
@@ -67,6 +67,9 @@ function openHiddenUrl(url) {
         var content = $('.post-content').html();
 
         console.log(title);      
+        var urlpage = $('form[name=aspnetForm]').attr('action');
+        
+        console.log(urlpage);        
 
         fs.writeFileSync(OUTPUTDIR + createFilename(url), $.html());
     
