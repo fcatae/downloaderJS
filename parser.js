@@ -27,15 +27,34 @@ function processResult(title, content, $) {
     
     var linkList = hrefs.map(function() {
         return $(this).attr('href');
-    }).get();
+    }).get();    
     
-    console.log('IMG')
-    console.log(imageList);
+//     console.log('IMG')
+//     console.log(imageList);
+// 
+//     console.log('LINK')
+//     console.log(linkList);
+        
+    getExternalImage(imageList[0]);
+}
 
-    console.log('LINK')
-    console.log(linkList);
+var cache = {};
+
+function getExternalImage(url) {
+    console.log(url);
+
+    request( {url: url, encoding: null} , function(error, request, body) {
+       cache[url] = body;
+
+       var contentType = request.headers['content-type'];
+       var contentData = body.toString('base64');
+       
+       fs.writeFileSync('fcatae.htm', `<img src="data:${contentType};base64,${contentData}">`);
+       
+    });    
+        
+    request(url).pipe(fs.createWriteStream("fcatae.png"));
     
 }
-//.pipe(fs.createWriteStream("fcatae.htm"));
 
 
