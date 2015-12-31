@@ -12,11 +12,11 @@ function processPage(body) {
     var title = document('.post-name').text();
     var content = document('.post-content').html();
     
-    processResult(content, finishImageProcessing);    
-    
     console.log("title: " + title);
     
-    function finishImageProcessing(html) {
+    processResult(content, finishProcessing);    
+    
+    function finishProcessing(html) {
         fs.writeFileSync(title + '.htm', html);
     }
 }
@@ -25,36 +25,25 @@ function processResult(content, callback) {
     
     var $ = cheerio.load(content);
     
-    var imgs = $('img');
-    var hrefs = $('a');
-    
-    var imageList = imgs.map(function() {
-        return $(this).attr('src');
-        }).get();
-    
-    var linkList = hrefs.map(function() {
-        return $(this).attr('href');
-    }).get();    
-    
-//     console.log('IMG')
-//     console.log(imageList);
-// 
-//     console.log('LINK')
-//     console.log(linkList);    
-   
-    processImages($, function() {
+    // var hrefs = $('a');
+    // 
+    // var linkList = hrefs.map(function() {
+    //     return $(this).attr('href');
+    // }).get();    
+       
+    processImages( $('img'), function() {
         callback($.html());
     });
     
 }
 
 
-function processImages($, callback) {
+function processImages(images, callback) {
     
     var tasks = 0;
     
-        $('img').each(function() {
-        createInlineImage($(this));
+    images.each(function(i, elem) {
+        createInlineImage(elem);
     });    
     
     function createInlineImage(elem) {        
@@ -87,8 +76,6 @@ function processImages($, callback) {
             callback(imageSrc);
                     
         });    
-            
-        //request(url).pipe(fs.createWriteStream("fcatae.png"));
         
     }
 }
