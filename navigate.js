@@ -24,6 +24,26 @@ function example() {
     });        
 }
 
+function createCache(secret, filelist, output_dir) {
+    init(secret, output_dir);
+    
+    filelist.forEach(function(url) {
+        var filename = createFilename(url);
+        var pathname = OUTPUTDIR + filename;
+        
+        var fileExists = false;         
+        try {
+           fs.statSync(pathname);
+           fileExists = true; 
+        }
+        catch(e) {
+        }
+
+        fileExists || openHiddenUrl(url, filename);        
+    });        
+
+}
+
 function init(secret, output_dir) {
     OUTPUTDIR = output_dir || OUTPUTDIR;
     initAuthRequest(secret.url, secret.token);
@@ -74,4 +94,5 @@ function createFilename(url) {
 }
 
 exports.init = init; 
-exports.create = openHiddenUrl;
+exports.download = openHiddenUrl;
+exports.createCache = createCache; 

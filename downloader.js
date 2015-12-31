@@ -56,20 +56,11 @@ function startStep2() {
     var secret = require('./output/secret');
     var navigate = require('./navigate')
     
-    navigate.init(secret);
-    
-    filelist.forEach(function(filename) {
-        navigate.create(filename);
-    });
+    navigate.createCache(secret, filelist, 'output-hidden/');
 }
 
-
-// navigate URL's with AUTH
-
-// download webpage
-
-
 // 3. open pages and validate the cache. cached?
+
 
 // parser logic
 
