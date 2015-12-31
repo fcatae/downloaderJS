@@ -2,6 +2,7 @@ var cheerio = require('cheerio');
 var request = require('request');
 var fs = require('fs');
 var URL = require('url');
+var OUTPUTDIR = 'output/';
 
 request('http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source.aspx', function(error, request, body) {
     processPage(body);
@@ -18,7 +19,7 @@ function processPage(body) {
     processResult(content, finishProcessing);    
     
     function finishProcessing(html) {
-        fs.writeFileSync(title + '.htm', html);
+        fs.writeFileSync(OUTPUTDIR + title + '.htm', html);
     }
 }
 
@@ -46,6 +47,7 @@ function processLinks(hrefs, callback) {
         
         var href = cheerio(this).attr('href');
         printFilename(href);
+        saveExternalImage(href);
                 
         return href;
         
@@ -95,6 +97,22 @@ function processImages(images, callback) {
         });    
         
     }
+}
+
+function saveExternalImage(url, callback) {
+
+    var path = URL.parse(url).path;
+    var filename = path.split('/').pop();
+     
+    if( filename && filename.match(/(PNG|JPG)$/i) ) {
+
+        request( {url: url, encoding: null} , function(error, response, body) {
+            console.log('writing: ' + OUTPUTDIR + filename)
+            fs.writeFile(OUTPUTDIR + filename, body, callback);
+        });   
+
+    }
+    
 }
 
 function printFilename(src) {
