@@ -7,32 +7,33 @@ request('http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source
 });
 
 function processPage(body) {
-    var $ = cheerio.load(body);
+    var document = cheerio.load(body);
 
-    var title = $('.post-name').text();
-    var content = $('.post-content').html();
+    var title = document('.post-name').text();
+    var content = document('.post-content').html();
     
-    processResult(title, content, $);
+    processResult(title, content, cheerio.load(content) );
 }
 
 function processResult(title, content, $) {
     console.log("title: " + title);
     
-    // fs.writeFile('fcatae.htm', content);
-    
     var imgs = $('img');
     var hrefs = $('a');
     
+    var imageList = imgs.map(function() {
+        return $(this).attr('src');
+        }).get();
+    
+    var linkList = hrefs.map(function() {
+        return $(this).attr('href');
+    }).get();
+    
     console.log('IMG')
-    imgs.each(function() {
-        console.log('    ' + $(this).attr('src'));
-    });
-    
+    console.log(imageList);
+
     console.log('LINK')
-    hrefs.each(function() {
-        console.log('    ' + $(this).attr('href'));
-    });
-    
+    console.log(linkList);
     
 }
 //.pipe(fs.createWriteStream("fcatae.htm"));
