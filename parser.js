@@ -4,38 +4,58 @@ var fs = require('fs');
 var URL = require('url');
 var OUTPUTDIR = 'output/';
 
-fs.mkdir(OUTPUTDIR, function(err) {
+try {
+    fs.mkdirSync(OUTPUTDIR);    
+} catch(e) {}
 
-    // ignore err
+example();
+
+function example() {
+    
     processUrl('http://blogs.msdn.com/b/fcatae/archive/2015/12/15/microsoft-open-source.aspx');
-    
-});
 
 
-function processUrl(url) {
-    
-    request(url, function(error, request, body) {
-        processPage(url, body);
-    });
+    function processUrl(url) {
+        
+        request(url, function(error, request, body) {
+            processPage(body);
+        });
+
+    }
 
 }
 
-function processPage(url, body) {
+
+function processPage(body) {
+    
     var document = cheerio.load(body);
     
     var title = document('.post-name').text();    
     var content = document('.post-content').html();
+    var url = document('form[name=aspnetForm]').attr('action');
     
     console.log("title: " + title);
 
-    fs.writeFileSync(OUTPUTDIR + createFilename(url), document.html());
+    content = `<h1>${title}</h1>` + content;
     
-    processResult(content, finishProcessing);    
+    //fs.writeFileSync(OUTPUTDIR + createFilename(url), document.html());
+    var pathname = OUTPUTDIR + createFilename2(url);
+    var fileExists = false;
     
-    function finishProcessing(html) {
-        var filename = createFilename2(url);
-        console.log("filename: " + filename);
-        fs.writeFileSync(OUTPUTDIR + filename, html);
+    try {
+        fs.statSync(pathname);
+        fileExists = true;
+        console.log("  cached: " + pathname);
+    } catch(e) {}
+    
+    if(!fileExists) {
+        processResult(content, finishProcessing);    
+        
+        function finishProcessing(html) {
+            console.log("  created: " + pathname);
+            fs.writeFileSync(pathname, html);
+        }
+        
     }
 }
 
@@ -80,6 +100,10 @@ function processImages(images, callback) {
     images.each(function() {
         createInlineImage(cheerio(this));
     });    
+    
+    if(images.length == 0) {
+        callback();
+    }
     
     function createInlineImage(elem) {        
                 
@@ -171,3 +195,4 @@ function printFilename(src) {
     
 }
 
+exports.create = processPage; 

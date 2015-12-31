@@ -24,6 +24,15 @@ function example() {
     });        
 }
 
+function get(url) {
+
+    var filename = createFilename(url);
+    var pathname = OUTPUTDIR + filename;
+    
+    return fs.readFileSync(pathname, 'utf8');
+    
+}
+
 function createCache(secret, filelist, output_dir) {
     init(secret, output_dir);
     
@@ -79,7 +88,7 @@ function openHiddenUrl(url, filename) {
         
         //console.log(urlpage);        
 
-        fs.writeFileSync(OUTPUTDIR + filename, $.html());
+        fs.writeFileSync(OUTPUTDIR + filename, $.html(), 'utf8');
     
     });    
 
@@ -95,4 +104,5 @@ function createFilename(url) {
 
 exports.init = init; 
 exports.download = openHiddenUrl;
-exports.createCache = createCache; 
+exports.createCache = createCache;
+exports.get = get; 

@@ -50,17 +50,36 @@ function completeStep1() {
     startStep2();
 }
 
+var navigate;
+
 // 2. open json file and check pages. downloaded?
 function startStep2() {
     
     var secret = require('./output/secret');
-    var navigate = require('./navigate')
+    var output_dir = 'output-hidden/';   
+
+    navigate = require('./navigate')
+    navigate.createCache(secret, filelist, output_dir);
     
-    navigate.createCache(secret, filelist, 'output-hidden/');
+    console.log('Step 2. Cache created at: ' + output_dir);
+    
+    startStep3();
 }
 
 // 3. open pages and validate the cache. cached?
+function startStep3() {
+    console.log('Step 3. Start downloading files... ');
+    
+    var parser = require('./parser')
+    
+    filelist.forEach(function(filename) {
+       
+       var post_content = navigate.get(filename);
 
+       parser.create(post_content);
+       
+    });
+}
 
 // parser logic
 
