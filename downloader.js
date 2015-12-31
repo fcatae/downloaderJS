@@ -25,6 +25,12 @@ var list_hidden = [
     'http://blogs.msdn.com/b/fcatae/archive/2016/01/05/monitore-o-consumo-de-recursos-do-banco-de-dados.aspx'
     ];
 
+// 0. create OUTPUT folder
+try {
+    //fs.mkdirSync('output');
+    // MISSING output folder = missing SECRETS!    
+} catch(e) {}
+
 // 1. check json file. exists?
 var filelist = checkFilelistJson('output/filelist.json');
 
@@ -56,7 +62,7 @@ var navigate;
 function startStep2() {
     
     var secret = require('./output/secret');
-    var output_dir = 'output-hidden/';   
+    var output_dir = 'output/';   
 
     navigate = require('./navigate')
     navigate.createCache(secret, filelist, output_dir);
