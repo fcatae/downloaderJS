@@ -21,23 +21,53 @@ var lista = [
     'http://blogs.msdn.com/b/fcatae/archive/2016/01/19/os-7-grandes-mitos-do-perfmon-parte-1.aspx'
     ];
 
-var i;
-var page;
+// simple parallelism
 
-for(i=0; i<lista.length; i++) {
-   
-    (function requestPage(page) {
-        
-        console.log('page request');
-        request(page, function(error, response, body) {
-            console.log(page); 
-        });
-        
-    })(lista[i]);
+// var i;
+// var page;
+// 
+// for(i=0; i<lista.length; i++) {
+//    
+//     (function requestPage(page) {
+//         
+//         console.log('page request');
+//         request(page, function(error, response, body) {
+//             console.log(page); 
+//         });
+//         
+//     })(lista[i]);
+//     
+// }
+
+var page_number = 0;
+var workers = 0;
+var TOTAL_WORKERS = 4;
+
+function continueCrawler() {
     
+    if( workers < TOTAL_WORKERS && page_number < lista.length ) {
+    
+        (function requestPage(page) {
+        
+        page_number++;
+        workers++;
+        console.log('page request');
+        
+        request(page, function(error, response, body) {
+            workers--;
+            console.log(page); 
+            
+            continueCrawler();
+            });
+        
+        // function requestPage
+        })(lista[page_number]);
+
+        continueCrawler();        
+    }        
 }
 
-
+continueCrawler();
 
 // var fs = require("fs");
 // request("http://blogs.msdn.com/fcatae").pipe(fs.createWriteStream("fcatae.htm"));
