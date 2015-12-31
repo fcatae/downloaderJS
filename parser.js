@@ -12,11 +12,18 @@ function processPage(body) {
     var title = document('.post-name').text();
     var content = document('.post-content').html();
     
-    processResult(title, content, cheerio.load(content) );
+    processResult(content, finishImageProcessing);    
+    
+    console.log("title: " + title);
+    
+    function finishImageProcessing(html) {
+        fs.writeFileSync(title + '.htm', html);
+    }
 }
 
-function processResult(title, content, $) {
-    console.log("title: " + title);
+function processResult(content, callback) {
+    
+    var $ = cheerio.load(content);
     
     var imgs = $('img');
     var hrefs = $('a');
@@ -33,55 +40,58 @@ function processResult(title, content, $) {
 //     console.log(imageList);
 // 
 //     console.log('LINK')
-//     console.log(linkList);
+//     console.log(linkList);    
+   
+    processImages($, function() {
+        callback($.html());
+    });
+    
+}
+
+
+function processImages($, callback) {
     
     var tasks = 0;
     
-    imgs.each(function() {
+        $('img').each(function() {
         createInlineImage($(this));
-    });
-    
-    //createInlineImage($('img'));
+    });    
     
     function createInlineImage(elem) {        
-                 
+                
         tasks++;   
         var src = elem.attr('src');                   
-                   
+                
         getExternalImage(src, function(imageSrc) {            
             elem.attr('src', imageSrc);
             
-            console.log(elem.parent().html())
+            console.log(src);
             
             tasks--;
             
             if(tasks == 0) {
-                finishImageProcessing();                 
+                callback();                 
             }
         });        
-    }    
-    
-    function finishImageProcessing() {
-        fs.writeFileSync('fcatae.htm', $.html());
+    }   
+        
+    function getExternalImage(url, callback) {
+
+        request( {url: url, encoding: null} , function(error, response, body) {
+
+            var contentType = response.headers['content-type'];
+            var contentData = body.toString('base64');
+            
+            var imageSrc = `data:${contentType};base64,${contentData}`;
+
+            callback(imageSrc);
+                    
+        });    
+            
+        //request(url).pipe(fs.createWriteStream("fcatae.png"));
+        
     }
-    
 }
 
-function getExternalImage(url, callback) {
-
-    request( {url: url, encoding: null} , function(error, response, body) {
-
-        var contentType = response.headers['content-type'];
-        var contentData = body.toString('base64');
-        
-        var imageSrc = `data:${contentType};base64,${contentData}`;
-
-        callback(imageSrc);
-                   
-    });    
-        
-    //request(url).pipe(fs.createWriteStream("fcatae.png"));
-    
-}
 
 
